@@ -44,17 +44,7 @@ class Jsl:
         self.__cb = None
         self._cookie: Optional[str] = None
 
-    def set_cookie(self, cookie: str):
-        self._cookie = cookie
 
-    def _get_headers(self) -> dict:
-        default = {
-            # pylint: disable=line-too-long
-            "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko",
-        }
-        if self._cookie:
-            default = {**default, 'Cookie': self._cookie}
-        return default
 
     @staticmethod
     def formatetfindexjson(fundbjson):
@@ -66,14 +56,6 @@ class Jsl:
             result[fundb_id] = cell
         return result
 
-    @staticmethod
-    def formatjisilujson(data):
-        result = {}
-        for row in data["rows"]:
-            cell = row["cell"]
-            id_ = row["id"]
-            result[id_] = cell
-        return result
 
     @staticmethod
     def percentage2float(per):
@@ -153,25 +135,7 @@ class Jsl:
         """以字典形式返回QDII数据
         :param min_volume:最小交易量，单位万元
         """
-        # 添加当前的ctime
-        self.__qdii_url = self.__qdii_url.format(ctime=int(time.time()))
-        # 请求数据
-        rep = requests.get(self.__qdii_url)
-        # 获取返回的json字符串
-        fundjson = json.loads(rep.text)
-        # 格式化返回的json字符串
-        data = self.formatjisilujson(fundjson)
-        data = {x: y for x, y in data.items() if y["notes"] != "估值有问题"}
-        # 过滤小于指定交易量的数据
-        if min_volume:
-            data = {
-                k: data[k]
-                for k in data
-                if float(data[k]["volume"]) > min_volume
-            }
-
-        self.__qdii = data
-        return self.__qdii
+        pass
 
     # pylint: disable=invalid-name
     def cb(self, min_volume=0, cookie: str=None):
@@ -179,25 +143,7 @@ class Jsl:
         :param min_volume:最小交易量，单位万元
         :cookie: 登陆凭证，可以从浏览器获取的对应 Cookie
         """
-        # 添加当前的ctime
-        self.__cb_url = self.__cb_url.format(ctime=int(time.time()))
-        # 请求数据
-        session = requests.Session()
-        rep = session.get(self.__cb_url,headers=self._get_headers())
-        # 获取返回的json字符串
-        fundjson = json.loads(rep.text)
-        # 格式化返回的json字符串
-        data = self.formatjisilujson(fundjson)
-        # 过滤小于指定交易量的数据
-        if min_volume:
-            data = {
-                k: data[k]
-                for k in data
-                if float(data[k]["volume"]) > min_volume
-            }
-
-        self.__cb = data
-        return self.__cb
+        pass
 
 
 if __name__ == "__main__":
